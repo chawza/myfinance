@@ -1,7 +1,10 @@
 from django.shortcuts import render
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from wallet.models import Transaction, Transfer
-# Create your views here.
+import json
 
 def get_transaction_history(req: HttpRequest):
-    pass
+    trans_query = Transaction.objects.all()
+    transactions = [tran.serialize() for tran in trans_query]
+    payload = json.dumps(transactions)
+    return HttpResponse(content=payload) 
