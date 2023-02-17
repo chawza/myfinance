@@ -8,7 +8,7 @@ class Account(models.Model):
         ('IDR', 'Indonesia Rupiah'),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='accounts')
     name = models.CharField(max_length=256)
     currency = models.CharField(max_length=256, choices=CURRENCY_CHOICE, default=CURRENCY_CHOICE[0][1])
 
@@ -18,7 +18,7 @@ class Transaction(models.Model):
         INCOME = 'Income'
     
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE) 
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions') 
     category = models.CharField(max_length=256)
     amount = models.FloatField()
     type = models.CharField(max_length=256, choices=Type.choices)
@@ -38,7 +38,6 @@ class Transaction(models.Model):
 
 class Transfer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    from_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='source_account')
-    target_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='target_account')
+    from_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transfers_from')
+    target_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transfers_target')
     amount = models.FloatField()
-
