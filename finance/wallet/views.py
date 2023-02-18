@@ -5,7 +5,7 @@ import json
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django import http
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie 
 
 from wallet.models import Transaction, Transfer, User, Account
 from wallet.forms import GetTransactionForm, CreateNewTransaction
@@ -19,7 +19,6 @@ def _parse_date(str_date: str | None, default: datetime) -> datetime:
 def _create_start_date(day_from_now = 3*30):
         return datetime.today() - timedelta(days=day_from_now)
 
-@csrf_exempt
 def get_transaction_history(req: HttpRequest):
     if req.method == 'GET':
         queries = {
