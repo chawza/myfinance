@@ -1,11 +1,14 @@
+from operator import itemgetter
+from datetime import datetime, timedelta
+import json
+
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django import http
-from wallet.models import Transaction, Transfer
-from wallet.forms import GetTransactionForm
-from datetime import datetime, timedelta
-from operator import itemgetter
-import json
+from django.views.decorators.csrf import csrf_exempt
+
+from wallet.models import Transaction, Transfer, User, Account
+from wallet.forms import GetTransactionForm, CreateNewTransaction
 
 def _parse_date(str_date: str | None, default: datetime) -> datetime:
     if str_date is None:
@@ -16,6 +19,7 @@ def _parse_date(str_date: str | None, default: datetime) -> datetime:
 def _create_start_date(day_from_now = 3*30):
         return datetime.today() - timedelta(days=day_from_now)
 
+@csrf_exempt
 def get_transaction_history(req: HttpRequest):
     if req.method == 'GET':
         queries = {
@@ -48,5 +52,24 @@ def get_transaction_history(req: HttpRequest):
             } for tran in transactions]
         } 
         return HttpResponse(content=json.dumps(payload))
+
+    if req.method == 'POST':
+        body = json.loads(req.body.decode())
+        form = CreateNewTransaction(body)
+
+        if not form.is_valid():
+            response_payload = form.errors.as_json()
+            return HttpResponseBadRequest(content=response_payload)
+
+        new_transaction = Transaction(
+            user=User.objects.get(id=body['user_id']),
+            account=Account.objects.get(id=body['account_id']),
+            **form.cleaned_data
+        )
+        new_transaction.save()
+        
+        return HttpResponse('transaction created')
+
     else:
         return http.HttpResponseBadRequest(f'Inavalid [{req.method}] method')
+    

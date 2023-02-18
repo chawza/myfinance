@@ -17,7 +17,7 @@ class Transaction(models.Model):
         EXPENSES = 'Expenses'
         INCOME = 'Income'
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transactions')
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions') 
     category = models.CharField(max_length=256)
     amount = models.FloatField()
@@ -35,6 +35,9 @@ class Transaction(models.Model):
             'note': self.note,
             'date': datetime.strftime(self.date, '%Y-%m-%d %H:%M:%S')
         }
+    
+    def __str__(self):
+        return f'[{self.account.name}]:{self.date.isoformat()}\tAmount: {self.account.currency}{self.amount}'
 
 class Transfer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
