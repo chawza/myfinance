@@ -7,17 +7,16 @@ class Account(models.Model):
     CURRENCY_CHOICE = (
         ('IDR', 'Indonesia Rupiah'),
     )
-
+ 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='accounts')
     name = models.CharField(max_length=256)
     currency = models.CharField(max_length=256, choices=CURRENCY_CHOICE, default=CURRENCY_CHOICE[0][1])
-
+        
 class Transaction(models.Model):
     class Type(models.TextChoices):
         EXPENSES = 'Expenses'
         INCOME = 'Income'
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transactions')
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions') 
     category = models.CharField(max_length=256)
     amount = models.FloatField()
@@ -25,17 +24,6 @@ class Transaction(models.Model):
     note = models.TextField()
     date = models.DateTimeField()
 
-    def serialize(self):
-        return {
-            'user_id': self.user.id,
-            'account': self.account.name,
-            'category': self.category,
-            'amount':self.category,
-            'type': self.type,
-            'note': self.note,
-            'date': datetime.strftime(self.date, '%Y-%m-%d %H:%M:%S')
-        }
-    
     def __str__(self):
         return f'[{self.account.name}]:{self.date.isoformat()}\tAmount: {self.account.currency}{self.amount}'
 
