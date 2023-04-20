@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from typing import List, Tuple
 
 from wallet.models import Transaction, Account, Transfer
-from wallet.scripts.TransactionReader import TransactionReader, TransactionRow
+from wallet.scripts.reader import TransactionReader, TransactionRow
 
 def populate_accounts(user: User, reader: TransactionReader):
     account_names = reader.get_all_acount_names()
@@ -21,10 +21,9 @@ def populate_transactions(user: User, reader: TransactionReader):
     for transaction in reader.read_transactions():
         transaction_read += 1
 
-        account = Account.objects.get(name=transaction.account)
+        account = Account.objects.get(user=user, name=transaction.account)
         transaction_type = transaction.type.upper()
         new_account = Transaction(
-            user=user,
             account=account,
             category=transaction.category,
             amount=transaction.amount,
@@ -74,14 +73,3 @@ def populate_transfers(user: User, reader: TransactionReader):
 
     print(f'Transfer Added: {transfer_added}({transfer_added*2}/{read_count})')
     print(f'trans_temp remains: {len(trans_temp)}')
-
-
-username = 'nabeel'
-csv_file_path = '/home/nabeel/Downloads/wallet-2021-2022.csv'
-
-user = User.objects.get(username=username)
-transaction_reader = TransactionReader(csv_file_path)
-
-# populate_accounts(user, transaction_reader)
-# populate_transactions(user, transaction_reader)
-populate_transfers(user, transaction_reader)
