@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'finance.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'myfinancedb', # This is where you put the name of the db file. 
+        'NAME': 'myfinancedb.sqlite',
     }
 }
 
