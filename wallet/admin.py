@@ -1,4 +1,17 @@
 from django.contrib import admin
-# Register your models here.
+from wallet.models import Transaction, Account, Transfer
 
 
+class TransactionAdmin(admin.ModelAdmin):
+    pass
+
+class AccountAdmin(admin.ModelAdmin):
+    pass
+
+class TransferAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Account, AccountAdmin)
+admin.site.register(Transaction, TransactionAdmin)
+admin.site.register(Transfer, TransactionAdmin)
