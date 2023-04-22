@@ -26,6 +26,16 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f'[{self.account.name}]:{self.date.isoformat()}\tAmount: {self.account.currency}{self.amount}'
+    
+    def serialize(self):
+        return {
+            "account": self.account.id,
+            "category": self.category,
+            "amount": self.amount,
+            "type": self.get_type_display(),
+            "note": self.note,
+            "note": self.date.timestamp()
+        }
 
 class Transfer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
