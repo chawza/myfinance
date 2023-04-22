@@ -8,7 +8,7 @@ def populate_accounts(user: User, reader: TransactionReader):
     account_names = reader.get_all_acount_names()
     counter = 0
     for account_name in account_names:
-        Account(user=user, name=account_name, currency='IDR').save()
+        Account(user=user, name=account_name, currency=Account.CURRENCY_CHOICE[0][1]).save()
         print('Account: ', account_name)
         counter += 1
     
