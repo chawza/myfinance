@@ -8,10 +8,11 @@ class BudgetItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=256, help_text="Item name or title")
     description = models.TextField()
-    amount = models.IntegerField() 
+    amount = models.IntegerField(default=0) 
     target = models.IntegerField()
     created_date = models.DateTimeField(default=timezone.now)
-    end_date = models.DateTimeField()
+    target_date = models.DateTimeField()
+    end_date = models.DateTimeField(blank=True, null=True)
 
     class Status(models.IntegerChoices):
         CREATED = 0, 'Created'
@@ -19,16 +20,19 @@ class BudgetItem(models.Model):
         CANCELED = 2, 'Canceled'
         FINISH = 3, 'Finish'
         REALOCATED = 4, 'Realocated'
-    status = models.PositiveSmallIntegerField(default=Status.CREATED)
+    status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.CREATED)
 
     class Currency(models.IntegerChoices):
         IDR = 0, "IDR"
-    currency = models.PositiveSmallIntegerField(Currency.choices, default=Currency.IDR)
+    currency = models.PositiveSmallIntegerField(choices=Currency.choices, default=Currency.IDR)
     
     class Repetion(models.IntegerChoices):
-        ONCE = 0, 'Once a day'
+        ONCE = 0, 'Once'
         DAILIY = 1, 'Daily'
         WEEKLY = 2, 'Weekly'
         MONTHLY = 3, 'Monthly'
         YEARLY = 4, "Yearly"
     repeat = models.PositiveSmallIntegerField(choices=Repetion.choices, default=Repetion.ONCE)
+
+    def __str__(self):
+        return f"{self.user.username}:{self.name}"
