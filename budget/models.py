@@ -1,9 +1,11 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 # Create your models here.
 
 class BudgetItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=256, help_text="Item name or title")
     description = models.TextField()
     amount = models.IntegerField() 
@@ -11,7 +13,7 @@ class BudgetItem(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField()
 
-    class Status(models.Model):
+    class Status(models.IntegerChoices):
         CREATED = 0, 'Created'
         ONGOING = 1, 'On Going' 
         CANCELED = 2, 'Canceled'
