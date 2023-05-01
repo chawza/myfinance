@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <style>
+        body{
+            width: 50rem;
+            margin: auto;
+        }
+
+        .section-header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        a.add-item {
+            font-size: 1rem;
+            align-self: center;
+        }
+        
+        .item-list {
+            display: grid;
+            grid-template-columns: 33% auto 33%;
+            grid-template-rows: auto;
+            gap: 1rem;
+        }
+
+        .budget-item {
+            background-color: lightgrey;
+            padding: 1rem;
+            border-radius: .4rem;
+        }
+    </style>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>My Wishlist</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <div class="main">
+            <section class="daily">
+                <div class="section-header">
+                    <h1>Wish List</h1>
+                    <a class="add-item" href="/admin/budget/budgetitem/">Add</a>
+                </div>
+                <div class="item-list">
+                    {% if wishlist %}
+                        {% for item in wishlist %}
+                            <div class="budget-item">
+                                <p>{{ item.name }}</p>
+                                <p>{{ item.get_currency_display }} {{ item.amount }}</p>
+                            </div>
+                        {% endfor %}
+                        {% for item in wishlist %}
+                            <div class="budget-item">
+                                <p>{{ item.name }}</p>
+                                <p>{{ item.get_currency_display }} {{ item.amount }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No Item Goals</p>
+                    {% endif %}
+                </div>
+            </section>
+            <section class="long-term">
+                <h1>Annual</h1>
+                {% if recuring %}
+                    {% for item in recuring %}
+                    {% endfor %}
+                {% else %}
+                    <p>No Item Goals</p>
+                {% endif %}
+            </section>
+        </div>
+        <script src="" async defer></script>
+    </body>
+</html>
