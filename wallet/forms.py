@@ -24,15 +24,22 @@ class GetTransactionsForm(forms.Form):
             )
         return value
 
+class CreateNewTransactionForm(forms.Form):
+    category = forms.CharField()
+    amount = forms.IntegerField(min_value=0)
+    type = forms.ChoiceField(choices=Transaction.Type.choices, initial=Transaction.Type.EXPENSES)
+    note = forms.CharField(widget=forms.Textarea())
+    date = forms.DateField()
 
-class CreateNewTransactionForm(forms.ModelForm):
-    class Meta:
-        model = Transaction
-        fields = ['category', 'amount', 'type', 'note', 'date']
+    def save(self):
+        pass
 
-class UpdateTransactionForm(forms.ModelForm):
-    class Meta:
-        model = Transaction
-        fields = ['category', 'amount', 'type', 'note', 'date']
+class UpdateTransactionForm(CreateNewTransactionForm):
+    def __init__(self, record: Transaction, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.record = record 
+
+    def save(self):
+        self.record.update(**self.cleaned_data)
 
 

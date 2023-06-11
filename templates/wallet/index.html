@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="content">
+        <section class="menu">
+            <div>
+                <a href="/wallet/add"><button>Add Record</button></a>
+            </div>
+        </section>
+        <section class="transactions">
+            {% if records %}
+                <table>
+                    <thead>
+                        <tr>
+                            <td>Message</td>
+                            <td>Date</td>
+                            <td>category</td>
+                            <td>Amount</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ record.note }}</td>
+                            <td>{{ record.date }}</td>
+                            <td>{{ record.category }}</td>
+                            <td>{{ record.amount }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+            <div class="no-record">
+                No Records found!
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</body>
+<style>
+    .content {
+        display: flex;
+        flex-direction: row;
+        min-height: 100vh; 
+    }
+
+    .menu {
+        width: 20rem;
+        display: flex;
+        flex-direction: column;
+        background-color: lightgray;
+    }
+
+    .transactions {
+        flex-grow: 1;
+        background-color: gray;
+
+        display: flex;
+    }
+
+    .no-record {
+        text-align: center;
+    }
+</style>
+</html>

@@ -1,47 +1,55 @@
-from operator import itemgetter
-from datetime import datetime, timedelta
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.http.request import HttpRequest
-from django.http.response import HttpResponseBadRequest, JsonResponse
-from django.views.decorators.csrf import ensure_csrf_cookie 
+from django.http.response import HttpResponseBadRequest, JsonResponse, HttpResponseRedirect
 from django.views import View
 
 from finance.api import status
+from django.contrib import messages
 
 from wallet.models import Transaction, Transfer, User, Account
-from wallet.forms import GetTransactionsForm
+from wallet.forms import GetTransactionsForm, CreateNewTransactionForm, UpdateTransactionForm
+    
+def index(req: HttpRequest):
+    context = {
+        "records": Transaction.objects.all() or []
+    }
+    return render(req, 'wallet/index.html', context)
 
-class TransactionAPIView(View):
-    def get(self, req: HttpRequest, id: int):
-        transaction = Transaction.objects.get(id=id)
-        if not transaction:
-            return HttpResponseBadRequest(status=status.HTTP_ERROR_NOT_FOUND)
-        return JsonResponse(data=transaction.serialize()) 
+def add_record(req: HttpRequest):
+    form = CreateNewTransactionForm(data=req.POST) 
 
-class TransactionsAPIView(View):
-
-    def get(self, req: HttpRequest):
-        form = GetTransactionsForm(data=req.GET)
-
+    if req.POST:
         if form.is_valid():
-            page, paginate = form.page, form.paginate
-            transactions = (
-                Transaction.objects
-                .filter(date__gte=form.start_date, date__lete=form.end_date)
-                .order_by(form.order)
-            )
-            # Paginate
-            # TODO: serilize data better
-            data = {
-                "data": [tran.serialize() for tran in transactions] if transactions else [],
-                "count": transactions.count(),
-                "page": page,
-                "paginate": paginate
-            }
+            form.save()
+            return redirect(reversed('wallet:home'))
+        else:
+            messages.error(req, message=form.errors.as_text()) 
 
-            return HttpResponse(content=json.dumps(data))
-        
-        return HttpResponseNotAllowed("invalid parameter")
+    context = {
+        "form": form 
+    }
+    return render(req, 'wallet/edit_record.html', context)
+
+def update_record(req: HttpRequest, id):
+    try:
+        record = Transaction.objects.get(pk=id)
+    except Transaction.DoesNotExist:
+        return HttpResponseBadRequest({"message": f"Pk not found {id}"})
+
+    form = UpdateTransactionForm(record=record, data=req.POST) 
+
+    if req.POST:
+        if form.is_valid():
+            form.save()
+            return redirect(reversed('wallet:home'))
+        else:
+            messages.error(req, message=form.errors.as_text()) 
+
+    context = {
+        "form": form,
+        "mode": "update"
+    }
+    return render(req, 'wallet/edit_record.html', context)

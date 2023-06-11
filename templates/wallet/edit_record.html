@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <form name="add-record-form" class="add-record-form" method="POST">
+            {% csrf_token %}
+            {{ form.account }}
+            {{ form.category }}
+            {{ form.type }}
+            {{ form.note }}
+            <input type="date" name="date"/>
+        </form>
+        <div class="button-area">
+            <a href="/wallet">back</a>
+            <button form="add-record-form">
+                {% if mode == 'update' %}
+                    Update Record
+                {% else %}
+                    Add Record
+                {% endif %}
+            </button>
+        </div>
+    </div>
+</body>
+<style>
+    body div {
+        margin-left: auto;
+        margin-right: auto;
+        width: fit-content;
+    }
+
+    form {
+        width: 30rem;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        margin-bottom: 1rem;
+    }
+
+    .button-area {
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+</style>
+</html>

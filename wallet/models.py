@@ -20,7 +20,7 @@ class Transaction(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions') 
     category = models.CharField(max_length=256)
     amount = models.FloatField()
-    type = models.SmallIntegerField(max_length=256, choices=Type.choices)
+    type = models.SmallIntegerField(choices=Type.choices, default=Type.EXPENSES)
     note = models.TextField()
     date = models.DateTimeField()
 
