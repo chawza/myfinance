@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime
+from django.utils.timezone import make_aware
 from dataclasses import dataclass
 
 @dataclass
@@ -21,16 +22,18 @@ class TransactionReader:
             self.df = pd.read_excel(filepath)
 
     def _parse_date(self, value) -> datetime:
+        date = None
         if type(value) is str:
-            return datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+            date = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
         elif type(value) is float:
-            return datetime.fromtimestamp(value)
+            date = datetime.fromtimestamp(value)
         elif type(value) is int:
-            return datetime.fromordinal(value)
+            date = datetime.fromordinal(value)
         elif type(value) is datetime:
-            return value
+            date = value
         else:
             raise Exception(f"Cannot parse :{type(value)}")
+        return make_aware(date)
     
     def read_transactions(self):
         for idx, row in self.df.iterrows():
@@ -63,3 +66,6 @@ class TransactionReader:
 
     def get_all_acount_names(self):
         return self.df['account'].unique()
+    
+    def get_categories(self):
+        return self.df['category'].unique()

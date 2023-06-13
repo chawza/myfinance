@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from typing import List, Tuple
 
-from wallet.models import Transaction, Account, Transfer
+from wallet.models import Transaction, Account, Transfer, Label
 from wallet.scripts.reader import TransactionReader, TransactionRow
 
 def populate_accounts(user: User, reader: TransactionReader):
@@ -14,6 +14,13 @@ def populate_accounts(user: User, reader: TransactionReader):
     
     print(f'Account Added: {counter}/{len(account_names)}')
 
+def pouplate_category(user: User, reader: TransactionReader):
+    categories = reader.get_categories()
+    for category in categories:
+        Label.objects.create(name=category, owner=user)
+    print('Categories : ', len(categories))
+    
+
 def populate_transactions(user: User, reader: TransactionReader):
     transaction_read = 0
     transaction_added = 0
@@ -22,16 +29,17 @@ def populate_transactions(user: User, reader: TransactionReader):
         transaction_read += 1
 
         account = Account.objects.get(user=user, name=transaction.account)
-        transaction_type = transaction.type.upper()
+        tran_type = 0 if transaction.type.lower() == 'expenses' else 1
+        label = Label.objects.get(name=transaction.category)
         new_account = Transaction(
             account=account,
-            category=transaction.category,
-            amount=transaction.amount,
+            amount=abs(transaction.amount),
             note=transaction.note,
             date=transaction.date,
-            type=transaction_type,
+            type=tran_type,
         )
         new_account.save()
+        new_account.labels.add(label)
 
         transaction_added += 1
 
@@ -73,3 +81,9 @@ def populate_transfers(user: User, reader: TransactionReader):
 
     print(f'Transfer Added: {transfer_added}({transfer_added*2}/{read_count})')
     print(f'trans_temp remains: {len(trans_temp)}')
+
+def delete_user_data(user: User):
+    _, count = Label.objects.filter(owner=user).delete()
+    print('labels deleted ', count)
+    _, count = user.accounts.all().delete()
+    print('accounts deleted ', count)

@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from enum import Enum 
-from datetime import datetime
+
 
 class Account(models.Model):
     CURRENCY_CHOICE = (
@@ -18,8 +17,9 @@ class Transaction(models.Model):
         INCOME = 'Income'
     
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions') 
-    category = models.CharField(max_length=256)
-    amount = models.FloatField()
+    # category = models.ForeignKey('wallet.Label', on_delete=models.CASCADE, related_name='categories')
+    labels = models.ManyToManyField('wallet.Label', related_name='transactions')
+    amount = models.IntegerField()
     type = models.SmallIntegerField(choices=Type.choices, default=Type.EXPENSES)
     note = models.TextField()
     date = models.DateTimeField()
@@ -30,11 +30,11 @@ class Transaction(models.Model):
     def serialize(self):
         return {
             "account": self.account.id,
-            "category": self.category,
+            "label": self.labels,
             "amount": self.amount,
             "type": self.get_type_display(),
             "note": self.note,
-            "note": self.date.timestamp()
+            "date": self.date.timestamp()
         }
 
 class Transfer(models.Model):
@@ -42,3 +42,7 @@ class Transfer(models.Model):
     from_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transfers_from')
     target_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transfers_target')
     amount = models.FloatField()
+
+class Label(models.Model):
+    name = models.CharField(max_length=256)
+    owner = models.ForeignKey(User, related_name='labels', on_delete=models.CASCADE)

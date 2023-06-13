@@ -1,5 +1,5 @@
 from django.contrib import admin
-from wallet.models import Transaction, Account, Transfer
+from wallet.models import Transaction, Account, Transfer, Label
 
 
 class TransactionAdmin(admin.ModelAdmin):
@@ -15,3 +15,4 @@ class TransferAdmin(admin.ModelAdmin):
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(Transfer, TransactionAdmin)
+admin.site.register(Label)

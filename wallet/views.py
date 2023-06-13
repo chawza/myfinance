@@ -1,16 +1,12 @@
 import json
 
 from django.shortcuts import render, redirect
-from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from django.http import HttpRequest
 from django.http.request import HttpRequest
-from django.http.response import HttpResponseBadRequest, JsonResponse, HttpResponseRedirect
-from django.views import View
-
-from finance.api import status
 from django.contrib import messages
 
-from wallet.models import Transaction, Transfer, User, Account
-from wallet.forms import GetTransactionsForm, CreateNewTransactionForm, UpdateTransactionForm
+from wallet.models import Transaction
+from wallet.forms import CreateNewTransactionForm, UpdateTransactionForm
     
 def index(req: HttpRequest):
     context = {
@@ -37,9 +33,10 @@ def update_record(req: HttpRequest, id):
     try:
         record = Transaction.objects.get(pk=id)
     except Transaction.DoesNotExist:
-        return HttpResponseBadRequest({"message": f"Pk not found {id}"})
+        messages.error(req, message=f"record with id {id} is not found")
+        return redirect(reversed('wallet:home'))
 
-    form = UpdateTransactionForm(record=record, data=req.POST) 
+    form = UpdateTransactionForm(record=record) 
 
     if req.POST:
         if form.is_valid():

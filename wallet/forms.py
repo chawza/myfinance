@@ -1,9 +1,5 @@
 from django import forms
-from wallet.models import Transaction, User, Account
-from django.http import HttpResponseBadRequest
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from enum import Enum
-from typing import Dict, Any
+from wallet.models import Transaction
 from django.utils import timezone
 
 DEFAULT_NUMBER_PER_PAGE = 20
@@ -29,17 +25,26 @@ class CreateNewTransactionForm(forms.Form):
     amount = forms.IntegerField(min_value=0)
     type = forms.ChoiceField(choices=Transaction.Type.choices, initial=Transaction.Type.EXPENSES)
     note = forms.CharField(widget=forms.Textarea())
-    date = forms.DateField()
+    date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
 
     def save(self):
-        pass
+        return Transaction.objects.create(
+            category=self.cleaned_data['category'],
+            amount=self.cleaned_data['amount'],
+            type=self.cleaned_data['type'],
+            note=self.cleaned_data['note'],
+            date=self.cleaned_data['date'],
+        )
 
 class UpdateTransactionForm(CreateNewTransactionForm):
     def __init__(self, record: Transaction, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.record = record 
+        self.record = record
+        self.fields['category'].initial = record.category
+        self.fields['amount'].initial = record.amount
+        self.fields['type'].initial = record.type
+        self.fields['note'].initial = record.note
+        self.fields['date'].initial = record.date
 
     def save(self):
         self.record.update(**self.cleaned_data)
-
-

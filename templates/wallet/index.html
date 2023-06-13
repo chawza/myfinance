@@ -27,10 +27,27 @@
                     <tbody>
                         {% for record in records %}
                         <tr>
-                            <td>{{ record.note }}</td>
-                            <td>{{ record.date }}</td>
-                            <td>{{ record.category }}</td>
-                            <td>{{ record.amount }}</td>
+                            <td class="note-col">
+                                <div>
+                                    <div>{{ record.note }}</div>
+                                    <a class="edit-row-btn" href="/wallet/update/{{ record.pk }}">
+                                        update
+                                    </a>
+                                </div>
+                            </td>
+                            <td class="date-col">
+                                <div>{{ record.date|date:'d M' }}</div>
+                            </td>
+                            <td>
+                                <div>
+                                    {% for label in record.labels.all %}
+                                        {{ label.name }}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td class="amount-col {% if record.type == 'Income' %}credit{% else %}debit{% endif %}">
+                                {{ record.amount }}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -59,13 +76,39 @@
 
     .transactions {
         flex-grow: 1;
-        background-color: gray;
-
         display: flex;
     }
 
     .no-record {
         text-align: center;
+    }
+
+    .edit-row-btn {
+        opacity: 0;
+        transition: 1s ease;
+    }
+
+    .note-col div {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .note-col:hover .edit-row-btn {
+        opacity: 100%;
+    }
+
+    .date-col {
+        width: 100%;
+    }
+
+    .amount_col .credit {
+        color: lightgreen;
+    }
+
+    .amount_col .debit {
+        color: red
     }
 </style>
 </html>
