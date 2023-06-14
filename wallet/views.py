@@ -1,5 +1,3 @@
-import json
-
 from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from django.http.request import HttpRequest
@@ -9,13 +7,16 @@ from wallet.models import Transaction
 from wallet.forms import CreateNewTransactionForm, UpdateTransactionForm
     
 def index(req: HttpRequest):
+    accounts = req.user.accounts.all()
+    records = Transaction.objects.filter(account__in=accounts)
+
     context = {
-        "records": Transaction.objects.all() or []
+        "records": records
     }
     return render(req, 'wallet/index.html', context)
 
 def add_record(req: HttpRequest):
-    form = CreateNewTransactionForm(data=req.POST) 
+    form = CreateNewTransactionForm(user=req.user, data=req.POST) 
 
     if req.POST:
         if form.is_valid():
@@ -36,7 +37,7 @@ def update_record(req: HttpRequest, id):
         messages.error(req, message=f"record with id {id} is not found")
         return redirect(reversed('wallet:home'))
 
-    form = UpdateTransactionForm(record=record) 
+    form = UpdateTransactionForm(user=req.user, record=record) 
 
     if req.POST:
         if form.is_valid():

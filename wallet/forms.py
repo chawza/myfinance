@@ -1,5 +1,5 @@
 from django import forms
-from wallet.models import Transaction
+from wallet.models import Transaction, Label
 from django.utils import timezone
 
 DEFAULT_NUMBER_PER_PAGE = 20
@@ -21,15 +21,19 @@ class GetTransactionsForm(forms.Form):
         return value
 
 class CreateNewTransactionForm(forms.Form):
-    category = forms.CharField()
+    labels= forms.ModelChoiceField(queryset=Label.objects.filter(), required=False) 
     amount = forms.IntegerField(min_value=0)
     type = forms.ChoiceField(choices=Transaction.Type.choices, initial=Transaction.Type.EXPENSES)
     note = forms.CharField(widget=forms.Textarea())
     date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
 
+    def __init__(self, user, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.labels.queryset = Label.objects.filter(owner=user)
+
     def save(self):
         return Transaction.objects.create(
-            category=self.cleaned_data['category'],
+            category=self.cleaned_data['labels'],
             amount=self.cleaned_data['amount'],
             type=self.cleaned_data['type'],
             note=self.cleaned_data['note'],
@@ -40,7 +44,7 @@ class UpdateTransactionForm(CreateNewTransactionForm):
     def __init__(self, record: Transaction, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.record = record
-        self.fields['category'].initial = record.category
+        self.fields['labels'].initial = record.labels
         self.fields['amount'].initial = record.amount
         self.fields['type'].initial = record.type
         self.fields['note'].initial = record.note

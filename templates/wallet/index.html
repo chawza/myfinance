@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% include "wallet/base.html"%}
+
+{% block content %}
     <div class="content">
         <section class="menu">
             <div>
@@ -56,87 +50,86 @@
             {% endif %}
         </section>
     </div>
-</body>
-<style>
-    .content {
-        display: flex;
-        flex-direction: column;
-        width: 50rem;
-        margin-left: auto;
-        margin-right: auto;
-        min-height: 100vh; 
-    }
+    <style>
+        .content {
+            display: flex;
+            flex-direction: column;
+            width: 50rem;
+            margin-left: auto;
+            margin-right: auto;
+            min-height: 100vh; 
+        }
 
 
-    .head {
-        background-color: lightgray;
-        padding: 1em 2em 1em 2em;
-    }
+        .head {
+            background-color: lightgray;
+            padding: 1em 2em 1em 2em;
+        }
 
-    .menu {
-        display: flex;
-        flex-direction: row;
-        justify-content: end;
-        margin-bottom: 2rem;
-    }
+        .menu {
+            display: flex;
+            flex-direction: row;
+            justify-content: end;
+            margin-bottom: 2rem;
+        }
 
-    .add-btn {
-        padding: 1em 2em 1em 2em;
-        border-radius: .4rem;
-    }
+        .add-btn {
+            padding: 1em 2em 1em 2em;
+            border-radius: .4rem;
+        }
 
-    .transactions {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .transaction-row {
-        display: flex;
-        flex-direction: row;
-        height: 2em;
-        padding: .5rem;
-        justify-items: center;
-    }
+        .transactions {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .transaction-row {
+            display: flex;
+            flex-direction: row;
+            height: 2em;
+            padding: .5rem;
+            justify-items: center;
+        }
 
-    .transaction-row:hover {
-        background-color: lightgray;
-        border-radius: .4rem;
-    }
-    
-    .note, .date, .labels, .amount {
-        margin-top: auto;
-        margin-bottom: auto;
-    }
+        .transaction-row:hover {
+            background-color: lightgray;
+            border-radius: .4rem;
+        }
+        
+        .note, .date, .labels, .amount {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
 
-    .date, .labels, .amount {
-        width: 6rem;
-        text-align: end;
-    }
+        .date, .labels, .amount {
+            width: 6rem;
+            text-align: end;
+        }
 
-    .note {
-        flex-grow: 1;
-    }
+        .note {
+            flex-grow: 1;
+        }
 
-    .labels {
-        width: 10rem;
-        overflow: hidden;
-    }
+        .labels {
+            width: 10rem;
+            overflow: hidden;
+        }
 
-    .no-record {
-        text-align: center;
-    }
+        .no-record {
+            text-align: center;
+        }
 
-    .date-col {
-        width: 100%;
-    }
+        .date-col {
+            width: 100%;
+        }
 
-    .amount .credit {
-        color: lightgreen;
-    }
+        .amount .credit {
+            color: lightgreen;
+        }
 
-    .amount .debit {
-        color: red
-    }
-</style>
-</html>
+        .amount .debit {
+            color: red
+        }
+    </style>
+{% endblock %}

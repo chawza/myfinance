@@ -1,22 +1,26 @@
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django import http
-from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.csrf import csrf_exempt
-# Create your views here.
+
 
 @csrf_exempt
 def auth_login(req: HttpRequest):
-    if req.method == 'POST':
-        username = req.GET.get('username', None)
-        password = req.GET.get('password', None)
-        user = authenticate(req, username=username, password=password)
+    if req.method == 'GET':
+        return render(req, 'auth/login.html')
 
-        if user is None:
-            return http.HttpResponseBadRequest('Invalid username or password')
-        login(req, user)
+    elif req.method == 'POST':
+        username = req.POST.get('username', None)
+        password = req.POST.get('password', None)
 
-        return HttpResponse(content='Logged in!')
+        if all([username, password]):
+            user = authenticate(req, username=username, password=password)
+            if user:
+                login(req, user)
+                return redirect(reverse('home')) 
+        return http.HttpResponseBadRequest('Invalid username or password')
 
     return http.HttpResponseForbidden(f'Invalid method: {req.method}')
 
