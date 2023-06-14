@@ -10,48 +10,45 @@
     <div class="content">
         <section class="menu">
             <div>
-                <a href="/wallet/add"><button>Add Record</button></a>
+                <a href="/wallet/add">
+                    <button class="add-btn">Add Record</button>
+                </a>
             </div>
         </section>
         <section class="transactions">
             {% if records %}
-                <table>
-                    <thead>
-                        <tr>
-                            <td>Message</td>
-                            <td>Date</td>
-                            <td>category</td>
-                            <td>Amount</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in records %}
-                        <tr>
-                            <td class="note-col">
-                                <div>
-                                    <div>{{ record.note }}</div>
-                                    <a class="edit-row-btn" href="/wallet/update/{{ record.pk }}">
-                                        update
-                                    </a>
-                                </div>
-                            </td>
-                            <td class="date-col">
-                                <div>{{ record.date|date:'d M' }}</div>
-                            </td>
-                            <td>
-                                <div>
-                                    {% for label in record.labels.all %}
-                                        {{ label.name }}
-                                    {% endfor %}
-                                </div>
-                            </td>
-                            <td class="amount-col {% if record.type == 'Income' %}credit{% else %}debit{% endif %}">
-                                {{ record.amount }}
-                            </td>
-                        </tr>
+                <div class="transaction-row head">
+                    <div class="note">Amount</div>
+                    <div class="date">Date</div>
+                    <div class="labels">Labels</div>
+                    <div class="amount">Amount</div>
+                </div>
+                {% for record in records %}
+                <div class="transaction-row">
+                    <a class="note" href="/wallet/update/{{ record.pk }}">
+                        {{ record.note }}
+                    </a>
+                    <div class="date">
+                        {{ record.date|date:'d M' }}
+                    </div>
+                    <div class="labels">
+                        {% for label in record.labels.all %}
+                        <div class="label">
+                            {{ label.name }}
+                        </div>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+                    <div class="amount
+                        {% if record.type == "Expenses"%}
+                        debit
+                        {% else %}
+                        credit
+                        {% endif %}
+                    ">
+                        {{ record.amount }}
+                    </div>
+                </div>
+                {% endfor %}
             {% else %}
             <div class="no-record">
                 No Records found!
@@ -63,51 +60,82 @@
 <style>
     .content {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
+        width: 50rem;
+        margin-left: auto;
+        margin-right: auto;
         min-height: 100vh; 
     }
 
-    .menu {
-        width: 20rem;
-        display: flex;
-        flex-direction: column;
+
+    .head {
         background-color: lightgray;
+        padding: 1em 2em 1em 2em;
+    }
+
+    .menu {
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+        margin-bottom: 2rem;
+    }
+
+    .add-btn {
+        padding: 1em 2em 1em 2em;
+        border-radius: .4rem;
     }
 
     .transactions {
         flex-grow: 1;
         display: flex;
+        flex-direction: column;
+    }
+    
+    .transaction-row {
+        display: flex;
+        flex-direction: row;
+        height: 2em;
+        padding: .5rem;
+        justify-items: center;
+    }
+
+    .transaction-row:hover {
+        background-color: lightgray;
+        border-radius: .4rem;
+    }
+    
+    .note, .date, .labels, .amount {
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
+    .date, .labels, .amount {
+        width: 6rem;
+        text-align: end;
+    }
+
+    .note {
+        flex-grow: 1;
+    }
+
+    .labels {
+        width: 10rem;
+        overflow: hidden;
     }
 
     .no-record {
         text-align: center;
     }
 
-    .edit-row-btn {
-        opacity: 0;
-        transition: 1s ease;
-    }
-
-    .note-col div {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        height: 100%;
-    }
-
-    .note-col:hover .edit-row-btn {
-        opacity: 100%;
-    }
-
     .date-col {
         width: 100%;
     }
 
-    .amount_col .credit {
+    .amount .credit {
         color: lightgreen;
     }
 
-    .amount_col .debit {
+    .amount .debit {
         color: red
     }
 </style>
