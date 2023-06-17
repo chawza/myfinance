@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from django.http.request import HttpRequest
 from django.contrib import messages
+from django.forms import model_to_dict
+from django.urls import reverse
 
 from wallet.models import Transaction
 from wallet.forms import CreateNewTransactionForm, UpdateTransactionForm
@@ -21,7 +23,7 @@ def add_record(req: HttpRequest):
     if req.POST:
         if form.is_valid():
             form.save()
-            return redirect(reversed('wallet:home'))
+            return redirect(reverse('wallet:home'))
         else:
             messages.error(req, message=form.errors.as_text()) 
 
@@ -35,14 +37,24 @@ def update_record(req: HttpRequest, id):
         record = Transaction.objects.get(pk=id)
     except Transaction.DoesNotExist:
         messages.error(req, message=f"record with id {id} is not found")
-        return redirect(reversed('wallet:home'))
-
-    form = UpdateTransactionForm(user=req.user, record=record) 
+        return redirect(reverse('wallet:home'))
+    
+    if req.POST:
+        extra_data = {'data': req.POST}
+    else:
+        extra_data = {'initial': model_to_dict(record, exclude=['id'])}
+    
+    form = UpdateTransactionForm(
+        user=req.user,
+        record=record,
+        **extra_data
+    )
 
     if req.POST:
-        if form.is_valid():
+        # if form.is_valid():
+        if False:
             form.save()
-            return redirect(reversed('wallet:home'))
+            return redirect(reverse('wallet:home'))
         else:
             messages.error(req, message=form.errors.as_text()) 
 

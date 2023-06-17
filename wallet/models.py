@@ -10,6 +10,9 @@ class Account(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='accounts')
     name = models.CharField(max_length=256)
     currency = models.CharField(max_length=256, choices=CURRENCY_CHOICE, default=CURRENCY_CHOICE[0][1])
+
+    def __str__(self) -> str:
+        return self.name
         
 class Transaction(models.Model):
     class Type(models.TextChoices):
@@ -17,7 +20,6 @@ class Transaction(models.Model):
         INCOME = 'Income'
     
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions') 
-    # category = models.ForeignKey('wallet.Label', on_delete=models.CASCADE, related_name='categories')
     labels = models.ManyToManyField('wallet.Label', related_name='transactions')
     amount = models.IntegerField()
     type = models.SmallIntegerField(choices=Type.choices, default=Type.EXPENSES)
@@ -46,3 +48,6 @@ class Transfer(models.Model):
 class Label(models.Model):
     name = models.CharField(max_length=256)
     owner = models.ForeignKey(User, related_name='labels', on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return self.name
