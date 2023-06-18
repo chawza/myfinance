@@ -13,6 +13,13 @@
                 <p>{{ username }}</p>
             </div>
         </section>
+        <section id="messages-area">
+            {% for message in messages %}
+            <div class="message">
+                <p>{{ message }}</p>
+            </div>
+            {% endfor %}
+        </section>
         <section id="content-area">
             {% block content %}
             {% endblock %}
@@ -39,6 +46,22 @@
 
     #content-area {
         width: 50rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #messages-area {
+        display: flex;
+        flex-direction: column;
+        width: 50rem;
+    }
+
+    #messages-area .message {
+        width: 100%;
+        background-color: red;
     }
 
 </style>
+
+{% block extra_css %}
+{% endblock %}
