@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum, QuerySet
 from django.contrib.auth.models import User
 
 
@@ -13,6 +14,10 @@ class Account(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+    @classmethod
+    def get_account_list_from(cls, user: User) -> QuerySet['Account']:
+        return user.accounts.annotate(total_amount=Sum('transactions__amount'))
         
 class Transaction(models.Model):
     class Type(models.TextChoices):

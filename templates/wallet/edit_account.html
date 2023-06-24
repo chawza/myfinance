@@ -1,0 +1,50 @@
+{% extends "wallet/base.html" %}
+
+{% block content %}
+    <div id="content-wrapper">
+        <h1>
+            {% if mode == 'update' %}
+                Update Account 
+            {% else %}
+                Create new Account 
+            {% endif %}
+        </h1>
+        <form id="account-form" class="account-from" method="POST">
+            {% csrf_token %}
+            {{ form.name }}
+        </form>
+
+        <div class="button-area">
+            <a href="/wallet">back</a>
+            <button form="account-form">
+                {% if mode == 'update' %}
+                    Update Account 
+                {% else %}
+                    Add Account 
+                {% endif %}
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        #content-wrapper {
+            width: 100%;
+        } 
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            margin-bottom: 1rem;
+        }
+
+        .button-area {
+            display: flex;
+            width: 100%;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    </style>
+{% endblock %}

@@ -40,3 +40,25 @@ class UpdateTransactionForm(CreateNewTransactionForm):
         self.record.note = self.cleaned_data['note']
         self.record.date = self.cleaned_data['date']
         self.record.save()
+
+class CreateAccount(forms.Form):
+    name = forms.CharField(max_length=256, widget=forms.TextInput(attrs={'placeholder': 'Account Name'}))
+
+    def __init__(self, user, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    def save(self) -> Account:
+        return Account.objects.create(user=self.user, name=self.cleaned_data['name'])
+    
+class UpdateAccount(forms.Form):
+    name = forms.CharField(max_length=256)
+
+    def __init__(self, account: Account, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.account = account
+
+    def save(self) -> None:
+        self.account.name = self.cleaned_data['name']
+        self.account.save(update_fields=['name'])
+    
