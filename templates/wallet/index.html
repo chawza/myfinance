@@ -1,4 +1,5 @@
 {% include "wallet/base.html"%}
+{% load utils %}
 
 {% block content %}
     <div class="content">
@@ -20,7 +21,11 @@
                 {% for record in records %}
                 <div class="transaction-row">
                     <a class="note" href="/wallet/update/{{ record.pk }}">
-                        {{ record.note }}
+                        {% if record.note %}
+                            {{ record.note }}
+                        {% else %}
+                            <p class="missing">no notes</p>
+                        {% endif %}
                     </a>
                     <div class="date">
                         {{ record.date|date:'d M' }}
@@ -39,7 +44,7 @@
                         credit
                         {% endif %}
                     ">
-                        {{ record.amount }}
+                        {{ record.amount|pretty_money }}
                     </div>
                 </div>
                 {% endfor %}
@@ -101,6 +106,7 @@
             height: 2em;
             padding: .5rem;
             justify-items: center;
+            gap: 1rem;
         }
 
         .transaction-row:hover {
@@ -114,12 +120,17 @@
         }
 
         .date, .labels, .amount {
-            width: 6rem;
+            width: fit-content;
             text-align: end;
         }
 
         .note {
             flex-grow: 1;
+        }
+
+        .note .missing {
+            font-style: italic;
+            color: gray;
         }
 
         .labels {

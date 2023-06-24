@@ -1,4 +1,5 @@
 {% extends "wallet/base.html" %}
+{% load utils %}
 
 {% block content %}
 <div class="content">
@@ -15,7 +16,7 @@
                     {{ account.name }}
                 </a>
             </p>
-            <p class="amount">{{ account.total_amount }}</p>
+            <p class="amount">{{ account.total_amount|pretty_money }}</p>
         </div>
         {% endfor %}
     </div>

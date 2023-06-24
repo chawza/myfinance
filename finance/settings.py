@@ -73,6 +73,9 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'wallet.context_processor.user_data'
             ],
+            'libraries': {
+                'utils': 'finance.templatetags.utils'
+            } 
         },
     },
 ]
