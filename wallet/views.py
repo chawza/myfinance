@@ -4,6 +4,7 @@ from django.http.request import HttpRequest
 from django.contrib import messages
 from django.forms import model_to_dict
 from django.urls import reverse
+from django.core.paginator import Paginator
 
 from wallet.models import Transaction, Account
 from wallet import forms
@@ -13,8 +14,13 @@ def index(req: HttpRequest):
     accounts = req.user.accounts.all()
     records = Transaction.objects.filter(account__in=accounts)
 
+    records = Paginator(records, 20)
+    current_page = int(req.GET.get('page', 1))
+    current_page = current_page if current_page <= records.num_pages else 1
+    page = records.page(current_page)
+
     context = {
-        "records": records
+        "records": page
     }
     return render(req, 'wallet/index.html', context)
 

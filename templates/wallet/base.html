@@ -9,8 +9,17 @@
 <body>
     <div id="app">
         <section id="nav-container">
-            <div id="nav-bar">
-                <p>{{ username }}</p>
+            <nav id="nav-bar">
+                <div class="nav-left">
+                    <a class="home-logo nav-item" href="{% url 'home' %}">Wallet</a>
+                    <a class="nav-item" href="{% url 'accounts' %}">Accounts</a>
+                </div>
+                <div class="nav-right">
+                    <p class="nav-item">{{ username }}</p>
+                </div>
+            </nav>
+            <div>
+
             </div>
         </section>
         <section id="messages-area">
@@ -34,14 +43,40 @@
         flex-direction: column;
     }
 
+    #app a {
+        font-style: normal;
+        text-decoration: none;
+        color: black;
+    }
+
     #nav-bar {
         width: 50rem;
-        margin-left: auto;
-        margin-right: auto;
+        margin: 2rem auto 2rem auto;
 
         display: flex;
         flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .nav-left {
+        display: flex;
+        flex-direction: row;
+        justify-content: start;
+        gap: 2rem;
+    }
+
+    .nav-right {
+        display: flex;
+        flex-direction: row;
         justify-content: end;
+    }
+
+    .home-logo {
+        font-size: 2rem;
+    }
+
+    .nav-item {
+        align-self: center;
     }
 
     #content-area {

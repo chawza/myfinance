@@ -43,6 +43,18 @@
                     </div>
                 </div>
                 {% endfor %}
+                <div class="pagination">
+                    {% if records.has_next %}
+                        <a class="next" href="{% url 'home' %}?page={{ records.next_page_number }}">
+                            >> 
+                        </a>
+                    {% endif %}
+                    {% if records.has_previous %}
+                        <a class="previous" href="{% url 'home'%}?page={{ records.previous_page_number }}">
+                            <<
+                        </a>
+                    {% endif %}
+                </div>
             {% else %}
             <div class="no-record">
                 No Records found!
@@ -60,7 +72,6 @@
             min-height: 100vh; 
         }
 
-
         .head {
             background-color: lightgray;
             padding: 1em 2em 1em 2em;
@@ -73,7 +84,7 @@
             margin-bottom: 2rem;
         }
 
-        .add-btn {
+        .add-btn,.accounts-btn {
             padding: 1em 2em 1em 2em;
             border-radius: .4rem;
         }
@@ -130,6 +141,12 @@
 
         .amount .debit {
             color: red
+        }
+
+        .pagination {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
         }
     </style>
 {% endblock %}
