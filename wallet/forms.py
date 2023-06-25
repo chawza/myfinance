@@ -1,6 +1,7 @@
 from typing import Any, Dict
 from django import forms
 from wallet.models import Transaction, Label, Account
+from wallet.widgets import ColorPickerWidget
 
 
 class CreateNewTransactionForm(forms.Form):
@@ -41,9 +42,12 @@ class UpdateTransactionForm(CreateNewTransactionForm):
         self.record.date = self.cleaned_data['date']
         self.record.save()
 
-class CreateAccount(forms.Form):
+class AccountForm(forms.Form):
     name = forms.CharField(max_length=256, widget=forms.TextInput(attrs={'placeholder': 'Account Name'}))
+    color = forms.CharField(widget=ColorPickerWidget, initial='#808080')
 
+
+class CreateAccount(AccountForm):
     def __init__(self, user, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.user = user
@@ -51,8 +55,9 @@ class CreateAccount(forms.Form):
     def save(self) -> Account:
         return Account.objects.create(user=self.user, name=self.cleaned_data['name'])
     
-class UpdateAccount(forms.Form):
-    name = forms.CharField(max_length=256)
+class UpdateAccount(AccountForm):
+    name = forms.CharField(max_length=256, widget=forms.TextInput(attrs={'placeholder': 'Account Name'}))
+    color = forms.CharField(widget=ColorPickerWidget, initial='#808080')
 
     def __init__(self, account: Account, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

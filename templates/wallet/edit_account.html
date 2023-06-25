@@ -12,6 +12,11 @@
         <form id="account-form" class="account-from" method="POST">
             {% csrf_token %}
             {{ form.name }}
+            <div class="color-picker">
+                <p id="hex-display">{{ form.color.initial }}</p>
+                {{ form.color }}
+            </div>
+            
         </form>
 
         <div class="button-area">
@@ -24,6 +29,14 @@
                 {% endif %}
             </button>
         </div>
+        <script>
+            const color_element = document.getElementById('id_color')
+            const hex_display_element = document.getElementById('hex-display')
+
+            color_element.addEventListener('change', (e) => {
+                hex_display_element.innerText = color_element.value 
+            })
+        </script>
     </div>
 {% endblock %}
 
@@ -45,6 +58,25 @@
             width: 100%;
             flex-direction: row;
             justify-content: space-between;
+        }
+
+        .color-picker {
+            position: relative;
+            width: 100%;
+            height: 2rem;
+        }
+
+        #id_color {
+            width: 100%;
+        }
+
+        #hex-display {
+            position: absolute;
+            left: .5rem;
+            top: .5rem;
+            margin: 0;
+            font-size: 1rem;
+            color: white;
         }
     </style>
 {% endblock %}

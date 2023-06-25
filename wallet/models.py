@@ -11,6 +11,7 @@ class Account(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='accounts')
     name = models.CharField(max_length=256)
     currency = models.CharField(max_length=256, choices=CURRENCY_CHOICE, default=CURRENCY_CHOICE[0][1])
+    color = models.CharField(max_length=7, default='#808080')
 
     def __str__(self) -> str:
         return self.name
