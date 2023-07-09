@@ -31,10 +31,12 @@ class TransactionReader:
             date = datetime.fromordinal(value)
         elif type(value) is datetime:
             date = value
+        elif isinstance(value, pd.Timestamp):
+            date = value.to_pydatetime()
         else:
-            raise Exception(f"Cannot parse :{type(value)}")
+            raise ValueError(f"Cannot parse :{type(value)}")
         return make_aware(date)
-    
+
     def read_transactions(self):
         for idx, row in self.df.iterrows():
             if bool(row['transfer']) == True:
