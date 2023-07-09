@@ -3,12 +3,10 @@ from django.template import Library
 
 
 register = Library()
-locale.setlocale(locale.LC_ALL, '')
 
 
 @register.filter
-def pretty_money(value) -> str:
-    if isinstance(value, str):
+def pretty_money(value, prefix='Rp') -> str:
+    if not isinstance(value, int):
         value = int(value)
-    value = locale.currency(value, grouping=True)
-    return value 
+    return f'{prefix}{value:,.0f}'
