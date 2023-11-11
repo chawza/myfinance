@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models import Sum, QuerySet, Q, F
 from django.contrib.auth.models import User
+from datetime import datetime
+from django.template.loader import render_to_string
 
 
 class Account(models.Model):
@@ -58,13 +60,20 @@ class Transaction(models.Model):
             "note": self.note,
             "date": self.date.timestamp()
         }
+    
+    def render_html(self) -> str:
+        return render_to_string('wallet/components/transaction.html', {'record': self})
 
 class Transfer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     from_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transfers_from')
     target_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transfers_target')
     amount = models.FloatField()
+    date = models.DateTimeField(default=datetime.now)
     note = models.TextField(default='')
+
+    def render_html(self) -> str:
+        return render_to_string('wallet/components/transfer.html', {'record': self})
 
 class Label(models.Model):
     name = models.CharField(max_length=256)

@@ -2,24 +2,30 @@
 
 {% block content %}
     <div id="content-wrapper">
-        <form id="add-record-form" class="add-record-form" method="POST">
+        <button id="switch-form-btn"></button>
+        <form id="add-transaction" method="POST">
             {% csrf_token %}
-            {{ form.account }}
-            {{ form.amount }}
-            {{ form.labels }}
-            {{ form.type }}
-            {{ form.note }}
-            {{ form.date }}
+            {{ transaction_form.account }}
+            {{ transaction_form.amount }}
+            {{ transaction_form.labels }}
+            {{ transaction_form.type }}
+            {{ transaction_form.note }}
+            {{ transaction_form.date }}
+            <input hidden name="form" value="transaction"/>
+        </form>
+        <form id="add-transfer" method="POST">
+            {% csrf_token %}
+            {{ transfer_form.from_account }}
+            {{ transfer_form.target_account }}
+            {{ transfer_form.date }}
+            {{ transfer_form.note }}
+            <input hidden name="form" value="transfer"/>
         </form>
 
         <div class="button-area">
-            <a href="/wallet">back</a>
-            <button form="add-record-form">
-                {% if mode == 'update' %}
-                    Update Record
-                {% else %}
-                    Add Record
-                {% endif %}
+            <a href="{% url 'wallet:home' %}">back</a>
+            <button id="submit-btn">
+                Add / Update Record
             </button>
         </div>
     </div>
@@ -44,5 +50,48 @@
             flex-direction: row;
             justify-content: space-between;
         }
+
+        *.hidden {
+            display: none;
+        }
+
+        #switch-form-btn {
+            width: 100%;
+            padding: .2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
     </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const switchButton = document.getElementById('switch-form-btn')
+    const submitButton = document.getElementById('submit-btn')
+    const transactionForm = document.getElementById('add-transaction')
+    const transferForm = document.getElementById('add-transfer')
+
+    let form = true // true -> Tranasaction, false = Transfer 
+
+    function switchForm(isTransfer) {
+        form = isTransfer 
+        switchButton.innerHTML = form ? 'Transaction' : 'Transfer'
+
+        if (form) {
+            transferForm.classList.add('hidden')
+
+            transactionForm.classList.remove('hidden')
+            submitButton.setAttribute('form', 'add-transaction')
+        }
+        else {
+            transactionForm.classList.add('hidden')
+
+            transferForm.classList.remove('hidden')
+            submitButton.setAttribute('form', 'add-transfer')
+        }
+    }
+
+    switchButton.addEventListener('click', () => switchForm(!form))
+    switchForm(form)
+</script>
 {% endblock %}

@@ -1,0 +1,99 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    width: 50rem;
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 100vh;
+
+    .menu {
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+        margin-bottom: 2rem;
+
+        .add-btn,.accounts-btn {
+            padding: 1em 2em 1em 2em;
+            border-radius: .4rem;
+        }
+
+        background-color: red;
+
+    }
+
+    .transactions {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: blue;
+
+        .transaction-row {
+            background-color: lightgray;
+            padding: 1em 2em 1em 2em;
+
+            .note, .date, .labels, .amount {
+                margin-top: auto;
+                margin-bottom: auto;
+            }
+
+            .date, .labels, .amount {
+                width: fit-content;
+                text-align: end;
+            }
+
+            .note {
+                flex-grow: 1;
+            }
+
+            .note .missing {
+                font-style: italic;
+                color: gray;
+            }
+
+            .labels {
+                width: 10rem;
+                overflow: hidden;
+            }
+
+            .no-record {
+                text-align: center;
+            }
+
+            .date-col {
+                width: 100%;
+            }
+
+            .amount .credit {
+                color: lightgreen;
+            }
+
+            .amount .debit {
+                color: red
+            }
+
+        }
+
+        // Transaction logs
+        .record-row {
+            display: flex;
+            flex-direction: row;
+            min-height: 2em;
+            padding: .5rem;
+            justify-items: center;
+            gap: 1rem;
+            background-color: blue;
+        }
+
+        .record-row:hover {
+            background-color: lightgray;
+            border-radius: .4rem;
+        }
+        //
+
+        .pagination {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+        }
+    }
+}

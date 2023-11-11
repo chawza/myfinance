@@ -1,0 +1,27 @@
+{% load utils %}
+
+<div class="record-row">
+    <a class="note" href="{% url 'wallet:update_record' record.id %}">
+        {% if record.note %}
+            {{ record.note }}
+        {% else %}
+            <p class="missing">no notes</p>
+        {% endif %}
+    </a>
+    <div class="account-desc">
+        <div>
+            <p>from</p>
+            <p>{{ record.from_account.name }}</p>
+        </div>
+        <div>
+            <p>to</p>
+            <p>{{ record.target_account.name }}</p>
+        </div>
+    </div>
+    <div class="date">
+        {{ record.date|date:'d M Y' }}
+    </div>
+    <div class="amount">
+        {{ record.amount|pretty_money }}
+    </div>
+</div>

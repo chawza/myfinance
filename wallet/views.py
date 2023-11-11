@@ -6,13 +6,19 @@ from django.forms import model_to_dict
 from django.urls import reverse
 from django.core.paginator import Paginator
 
-from wallet.models import Transaction, Account
+from itertools import chain
+
+from wallet.models import Transaction, Account, Transfer
 from wallet import forms
 
     
 def index(req: HttpRequest):
     accounts = req.user.accounts.all()
-    records = Transaction.objects.filter(account__in=accounts)
+    transactions = Transaction.objects.filter(account__in=accounts).order_by('-date')
+    transfers = Transfer.objects.filter(user=req.user).order_by('-date')
+
+    records = chain(transactions, transfers)
+    records = sorted(records, key=lambda x: x.date, reverse=True)
 
     records = Paginator(records, 20)
     current_page = int(req.GET.get('page', 1))
@@ -25,17 +31,26 @@ def index(req: HttpRequest):
     return render(req, 'wallet/index.html', context)
 
 def add_record(req: HttpRequest):
-    form = forms.CreateNewTransactionForm(user=req.user, data=req.POST) 
+    transaction_form = forms.AddTransactionForm(user=req.user, data=req.POST) 
+    transfer_form = forms.AddTransferForm(user=req.user, data=req.POST)
 
     if req.POST:
-        if form.is_valid():
-            form.save()
-            return redirect(reverse('wallet:home'))
+        form_type = req.POST.get('form', None)
+        if form_type in ['transaction', 'transfer']:
+            if form_type == 'transaction':
+                if transaction_form.is_valid():
+                    transaction_form.save()
+                    messages.info(req, 'New Transaction has been added!')
+            else:
+                if transfer_form.is_valid():
+                    transfer_form.save()
+                    messages.info(req, 'New Transfer has been added!')
         else:
-            messages.error(req, message=form.errors.as_text()) 
+            messages.error(req, message="Unrecognized Form Type")
 
     context = {
-        "form": form 
+        "transaction_form": transaction_form,
+        "transfer_form": transfer_form, 
     }
     return render(req, 'wallet/edit_record.html', context)
 
@@ -51,7 +66,7 @@ def update_record(req: HttpRequest, id):
     else:
         extra_data = {'initial': model_to_dict(record, exclude=['id'])}
     
-    form = forms.UpdateTransactionForm(
+    form = forms.EditTransactionForm(
         user=req.user,
         record=record,
         **extra_data

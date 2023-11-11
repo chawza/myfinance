@@ -4,7 +4,7 @@
 {% block content %}
 <div class="content">
     <div class="buttons">
-        <a href="{% url 'add_account' %}">
+        <a href="{% url 'wallet:add_account' %}">
             <button class="add-btn">Add Account</button>
         </a>
     </div>
@@ -12,7 +12,7 @@
         {% for account in accounts %}
         <div class="row">
             <p>
-                <a href="{% url 'update_account' id=account.id %}">
+                <a href="{% url 'wallet:update_account' id=account.id %}">
                     {{ account.name }}
                 </a>
             </p>

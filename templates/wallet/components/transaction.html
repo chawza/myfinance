@@ -1,0 +1,30 @@
+{% load utils %}
+
+<div class="transaction-row">
+    <a class="note" href="{% url 'wallet:update_record' record.id %}">
+        {% if record.note %}
+            {{ record.note }}
+        {% else %}
+            <p class="missing">no notes</p>
+        {% endif %}
+    </a>
+    <div class="date">
+        {{ record.date|date:'d M Y' }}
+    </div>
+    <div class="labels">
+        {% for label in record.labels.all %}
+        <div class="label">
+            {{ label.name }}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="amount
+        {% if record.type == "Expenses"%}
+        debit
+        {% else %}
+        credit
+        {% endif %}
+    ">
+        {{ record.amount|pretty_money }}
+    </div>
+</div>

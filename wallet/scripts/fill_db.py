@@ -76,7 +76,7 @@ def populate_transfers(user: User, reader: TransactionReader):
         src_account = Account.objects.get(name=src.account)
         trgt_account = Account.objects.get(name=trgt.account)
         
-        Transfer(user=user, amount=abs(src.amount), from_account=src_account, target_account=trgt_account).save()
+        Transfer(user=user, amount=abs(src.amount), from_account=src_account, target_account=trgt_account, date=src.date).save()
         transfer_added += 1
 
     print(f'Transfer Added: {transfer_added}({transfer_added*2}/{read_count})')

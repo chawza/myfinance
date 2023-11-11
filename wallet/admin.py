@@ -3,7 +3,7 @@ from wallet.models import Transaction, Account, Transfer, Label
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    pass
+    ordering = ['-date',]
 
 class AccountAdmin(admin.ModelAdmin):
     pass
