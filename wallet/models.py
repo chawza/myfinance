@@ -1,8 +1,8 @@
 from django.db import models
 from django.db.models import Sum, QuerySet, Q, F
 from django.contrib.auth.models import User
-from datetime import datetime
 from django.template.loader import render_to_string
+from django.utils import timezone
 
 
 class Account(models.Model):
@@ -31,6 +31,15 @@ class Account(models.Model):
                 balance=F('initial') + F('income') - F('expense')
             )
         )
+    
+    def balance(self) -> int:
+        transactions: QuerySet[Transaction] = self.transactions
+        cumulative_balance = (
+            transactions
+            .filter(date__lte=timezone.now())
+            .aggregate(balance=Sum("amount", default=0))["balance"]
+        )
+        return self.initial + cumulative_balance
         
 class Transaction(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions') 
