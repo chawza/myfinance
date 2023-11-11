@@ -24,32 +24,29 @@ class Account(models.Model):
         return (
             Account.objects.filter(user=user)
             .annotate(
-                transfer_out=Sum('transfers_target__amount', default=0),
-                transfer_in=Sum('transfers_from__amount', default=0),
-            )
-            .annotate(
                 expense=Sum('transactions__amount', filter=Q(transactions__type=Transaction.Type.EXPENSES), default=0),
                 income=Sum('transactions__amount', filter=Q(transactions__type=Transaction.Type.INCOME), default=0),
             )
             .annotate(
-                balance=F('initial') + F('transfer_in') + F('income') - F('transfer_out') - F('expense')
+                balance=F('initial') + F('income') - F('expense')
             )
         )
         
 class Transaction(models.Model):
-    class Type(models.TextChoices):
-        EXPENSES = 0 
-        INCOME = 1 
-    
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions') 
     labels = models.ManyToManyField('wallet.Label', related_name='transactions')
     amount = models.IntegerField()
-    type = models.SmallIntegerField(choices=Type.choices, default=Type.EXPENSES)
     note = models.TextField()
     date = models.DateTimeField()
+    is_transfer = models.BooleanField(default=False)
+
+    class Type(models.IntegerChoices):
+        EXPENSES = 1, "Expenses"
+        INCOME = 2, "Income"
+    type = models.SmallIntegerField(choices=Type.choices, default=Type.EXPENSES)
 
     def __str__(self):
-        return f'[{self.account.name}]:{self.date.isoformat()}\tAmount: {self.account.currency}{self.amount}'
+        return self.note
     
     def serialize(self):
         return {
@@ -63,17 +60,6 @@ class Transaction(models.Model):
     
     def render_html(self) -> str:
         return render_to_string('wallet/components/transaction.html', {'record': self})
-
-class Transfer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    from_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transfers_from')
-    target_account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transfers_target')
-    amount = models.FloatField()
-    date = models.DateTimeField(default=datetime.now)
-    note = models.TextField(default='')
-
-    def render_html(self) -> str:
-        return render_to_string('wallet/components/transfer.html', {'record': self})
 
 class Label(models.Model):
     name = models.CharField(max_length=256)

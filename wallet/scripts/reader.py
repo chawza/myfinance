@@ -8,7 +8,7 @@ class TransactionRow:
     account: str
     category: str
     amount: float
-    is_transfer: str
+    is_transfer: bool 
     note: str
     date: datetime
     type: str
@@ -39,9 +39,6 @@ class TransactionReader:
 
     def read_transactions(self):
         for idx, row in self.df.iterrows():
-            if bool(row['transfer']) == True:
-                continue
-
             yield TransactionRow(
                 account=row['account'],
                 category=row['category'],

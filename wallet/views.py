@@ -8,17 +8,13 @@ from django.core.paginator import Paginator
 
 from itertools import chain
 
-from wallet.models import Transaction, Account, Transfer
+from wallet.models import Transaction, Account
 from wallet import forms
 
     
 def index(req: HttpRequest):
     accounts = req.user.accounts.all()
-    transactions = Transaction.objects.filter(account__in=accounts).order_by('-date')
-    transfers = Transfer.objects.filter(user=req.user).order_by('-date')
-
-    records = chain(transactions, transfers)
-    records = sorted(records, key=lambda x: x.date, reverse=True)
+    records = Transaction.objects.filter(account__in=accounts).order_by('-date')
 
     records = Paginator(records, 20)
     current_page = int(req.GET.get('page', 1))

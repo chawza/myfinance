@@ -1,6 +1,4 @@
-from io import StringIO
-from typing import Any, Optional
-
+from typing import Any
 from django.core.management.base import BaseCommand, CommandParser
 from django.db.transaction import atomic
 from wallet.models import User
@@ -31,9 +29,9 @@ class Command(BaseCommand):
 
     @atomic
     def handle(self, *args: Any, **options: Any) -> None:
-        username = options.get('username', None)
-        filepath = options.get('filepath', None)
-        reset = options.get('reset', None)
+        username: str = options.get('username', None)
+        filepath: str = options.get('filepath', None)
+        reset: bool = options.get('reset', None)
 
         if not username:
             raise Exception("Pleaser specify `username`!")
@@ -41,9 +39,7 @@ class Command(BaseCommand):
         if not filepath:
             raise Exception('Please specify `filepath`!')
 
-        user: User = User.objects.get(username=username)
-        if not user:
-            raise Exception(f"User with username: {username} is not found!")
+        user = User.objects.get(username=username.strip())
 
         if reset: 
             fill_db.delete_user_data(user)
@@ -52,4 +48,3 @@ class Command(BaseCommand):
         fill_db.populate_accounts(user, transaction_reader)
         fill_db.pouplate_category(user, transaction_reader)
         fill_db.populate_transactions(user, transaction_reader)
-        fill_db.populate_transfers(user, transaction_reader)
