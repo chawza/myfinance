@@ -21,8 +21,9 @@ class LabelAdminForm(ModelForm):
 
 class TransactionAdmin(admin.ModelAdmin):
     ordering = ['-date',]
-    list_display = ["note", "account", "amount_decimal", "date"]
+    list_display = ["note", "custom_account", "amount_decimal", "date"]
     list_filter = ["account", "is_transfer"]
+    list_select_related = ["account"]
 
     @admin.display(description="amount")
     def amount_decimal(self, obj: Transaction):
@@ -32,6 +33,16 @@ class TransactionAdmin(admin.ModelAdmin):
             style = ' style="color: #888888";'
 
         return format_html(f'<div{style}>{obj.amount:,.0f}</div>')
+    
+    @admin.display(description="account")
+    def custom_account(self, obj: Transaction):
+        style = ""
+
+        if obj.account.color:
+            style = f' style="color: {obj.account.color}";'
+
+        return format_html(f'<div{style}>{obj.account.name}</div>')
+        
 
 class AccountAdmin(admin.ModelAdmin):
     list_display = ["name", "balance_decimal"]
