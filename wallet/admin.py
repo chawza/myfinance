@@ -1,4 +1,7 @@
+from typing import Any
 from django.contrib import admin
+from django.db.models.query import QuerySet
+from django.http.request import HttpRequest
 from django.utils.html import format_html
 from django.forms import ModelForm
 from django.forms.widgets import TextInput
@@ -25,6 +28,12 @@ class TransactionAdmin(admin.ModelAdmin):
     list_filter = ["account", "is_transfer"]
     list_select_related = ["account"]
 
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Transaction]:
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            qs = qs.filter(account__in=request.user.accounts.all())
+        return qs
+
     @admin.display(description="amount")
     def amount_decimal(self, obj: Transaction):
         style = ""
@@ -48,12 +57,24 @@ class AccountAdmin(admin.ModelAdmin):
     list_display = ["name", "balance_decimal"]
     form = AccountAdminForm
 
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Transaction]:
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            qs = qs.filter(user=request.user)
+        return qs
+
     @admin.display(description="balance")
     def balance_decimal(self, obj: Account):
         return f'{obj.balance():,.0f}'
     
 class LabelAdmin(admin.ModelAdmin):
     form = LabelAdminForm
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Label]:
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            qs = qs.filter(owner=request.user)
+        return qs
 
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Transaction, TransactionAdmin)

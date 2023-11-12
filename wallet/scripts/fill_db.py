@@ -30,7 +30,7 @@ def populate_transactions(user: User, reader: TransactionReader):
 
         account = Account.objects.get(user=user, name=transaction.account)
         tran_type = Transaction.Type.EXPENSES if transaction.type.lower() == 'expenses' else Transaction.Type.INCOME
-        label = Label.objects.get(name=transaction.category)
+        label = Label.objects.get(name=transaction.category, owner=user)
         new_account = Transaction(
             account=account,
             amount=transaction.amount,
