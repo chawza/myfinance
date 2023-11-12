@@ -6,6 +6,7 @@ from django.utils.html import format_html
 from django.forms import ModelForm
 from django.forms.widgets import TextInput
 from wallet.models import Transaction, Account, Label
+from rangefilter.filters import DateRangeFilterBuilder
 
 
 class AccountAdminForm(ModelForm):
@@ -47,9 +48,11 @@ class TransactionAccountFilter(admin.SimpleListFilter):
         return queryset.filter(account=self.value())
 
 class TransactionAdmin(admin.ModelAdmin):
+    start_date_range = DateRangeFilterBuilder('Date Range')
+
     ordering = ['-date',]
     list_display = ["note", "custom_account", "amount_decimal", "date"]
-    list_filter = [TransactionAccountFilter, "is_transfer"]
+    list_filter = [TransactionAccountFilter, "is_transfer", ("date", start_date_range)]
     list_select_related = ["account"]
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Transaction]:
