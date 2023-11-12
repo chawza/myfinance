@@ -3,6 +3,7 @@ from django.db.models import Sum, QuerySet, Q, F
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.utils import timezone
+from cachetools.func import ttl_cache
 
 
 class Account(models.Model):
@@ -32,6 +33,7 @@ class Account(models.Model):
             )
         )
     
+    @ttl_cache()
     def balance(self) -> int:
         transactions: QuerySet[Transaction] = self.transactions
         cumulative_balance = (
@@ -73,6 +75,7 @@ class Transaction(models.Model):
 class Label(models.Model):
     name = models.CharField(max_length=256)
     owner = models.ForeignKey(User, related_name='labels', on_delete=models.CASCADE)
+    color = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.name

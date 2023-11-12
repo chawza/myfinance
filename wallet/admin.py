@@ -1,6 +1,22 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.forms import ModelForm
+from django.forms.widgets import TextInput
 from wallet.models import Transaction, Account, Label
+
+
+class AccountAdminForm(ModelForm):
+    class Meta:
+        model = Account
+        fields = "__all__"
+        widgets = {"color": TextInput(attrs={"type": "color"})}
+
+
+class LabelAdminForm(ModelForm):
+    class Meta:
+        model = Label
+        fields = "__all__"
+        widgets = {"color": TextInput(attrs={"type": "color"})}
 
 
 class TransactionAdmin(admin.ModelAdmin):
@@ -19,15 +35,15 @@ class TransactionAdmin(admin.ModelAdmin):
 
 class AccountAdmin(admin.ModelAdmin):
     list_display = ["name", "balance_decimal"]
+    form = AccountAdminForm
 
     @admin.display(description="balance")
     def balance_decimal(self, obj: Account):
         return f'{obj.balance():,.0f}'
-
-class TransferAdmin(admin.ModelAdmin):
-    pass
-
+    
+class LabelAdmin(admin.ModelAdmin):
+    form = LabelAdminForm
 
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Transaction, TransactionAdmin)
-admin.site.register(Label)
+admin.site.register(Label, LabelAdmin)
