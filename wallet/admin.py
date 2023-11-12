@@ -21,11 +21,35 @@ class LabelAdminForm(ModelForm):
         fields = "__all__"
         widgets = {"color": TextInput(attrs={"type": "color"})}
 
+class TransactionAccountFilter(admin.SimpleListFilter):
+    title = "Account"
+    parameter_name = "account"
+
+    def lookups(self, request: HttpRequest, model_admin: Any) -> list[tuple[Any, str]]:
+        accounts = Account.objects.all()
+
+        if not request.user.is_superuser:
+            accounts = accounts.filter(user=request.user)
+
+        if request.user.is_superuser:
+            return
+
+        for account in accounts:
+            yield (account.id, account.name)
+
+    def queryset(self, request: HttpRequest, queryset: QuerySet[Transaction]) -> QuerySet[Any] | None:
+        if not request.user.is_superuser:
+            queryset = queryset.filter(account__user=request.user)
+
+        if not self.value():
+            return queryset
+
+        return queryset.filter(account=self.value())
 
 class TransactionAdmin(admin.ModelAdmin):
     ordering = ['-date',]
     list_display = ["note", "custom_account", "amount_decimal", "date"]
-    list_filter = ["account", "is_transfer"]
+    list_filter = [TransactionAccountFilter, "is_transfer"]
     list_select_related = ["account"]
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Transaction]:
