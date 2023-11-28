@@ -1,6 +1,9 @@
 from django import forms
 from wallet.models import Transaction, Label, Account
 from wallet.widgets import ColorPickerWidget
+from multiselectfield import MultiSelectFormField
+from django.db.models import IntegerChoices, QuerySet
+from datetime import date, timedelta
 
 
 class AddTransactionForm(forms.Form):
@@ -67,4 +70,58 @@ class UpdateAccount(AccountForm):
     def save(self) -> None:
         self.account.name = self.cleaned_data['name']
         self.account.save(update_fields=['name'])
+
+def get_day_range(start: date, end: date):
+    delta = timedelta(days=1)
+    current = start
+    while current <= end:
+        yield current
+        current += delta
+
+class MonthlySummary(forms.Form):
+    start_date = forms.DateField(widget=forms.DateInput(attrs={"type":"date"}))
+    end_date  = forms.DateField(widget=forms.DateInput(attrs={"type":"date"}))
+    accounts = MultiSelectFormField()
+
+    class IntervalChoice(IntegerChoices):
+        DAILY = (1, 'Day')
+        MONTHLY = (2, 'Monthly')
+        YEARLY = (3, 'Yearly')
+    interval = forms.ChoiceField(choices=IntervalChoice.choices, initial=IntervalChoice.DAILY)
+
+    def __init__(self, accounts:QuerySet[Account], *args, **kwargs):
+        self.account_choice = accounts
+        super().__init__(*args, **kwargs)
+        choices = [(acc.id, acc.name) for acc in self.account_choice]
+        self.fields['accounts'].choices = choices
+
+
+    def get_chart_data(self, qs: QuerySet[Transaction], start: date, end: date, accounts) -> dict:
+        qs = qs.filter(
+            account__in=accounts,
+            date__gte=start,
+            date__lte=end,
+        )
+
+        date_range = get_day_range(start, end)
+
+        data = {date.isoformat(): 0 for date in date_range}
+
+        for record in qs:
+            key = record.date.date().isoformat()
+            data[key] += abs(record.amount)
+
+        return {
+            "type": "bar",
+            "data": {
+                "labels": list(data.keys()),
+                "datasets": [
+                    {
+                        'label': "All accounts",
+                        'data': list(data.values())
+                    }
+                ]
+            }
+        }
+
     

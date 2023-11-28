@@ -1,0 +1,24 @@
+{% extends "wallet/base.html"%}
+{% load static %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js" integrity="sha512-6HrPqAvK+lZElIZ4mZ64fyxIBTsaX5zAFZg2V/2WT+iKPrFzTzvx6QAsLW2OaLwobhMYBog/+bvmIEEGXi0p1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    window.addEventListener("load", e => {
+        const ctx = document.getElementById("summary");
+        const data = JSON.parse(ctx.getAttribute("datas"))
+        new Chart(ctx, data);
+    })
+</script>
+{% endblock %}
+
+{% block content %}
+<div>
+    <form>
+        {{ form.as_div }}
+        <button type="submit">Filter</button>
+    </form>
+    <canvas id="summary" datas="{{ chart_data }}"></canvas>
+</div>
+{% endblock %}

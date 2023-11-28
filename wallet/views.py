@@ -1,12 +1,13 @@
+import json
+
+from django.utils import timezone
 from django.shortcuts import render, redirect
-from django.http import HttpRequest
-from django.http.request import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 from django.forms import model_to_dict
 from django.urls import reverse
 from django.core.paginator import Paginator
-
-from itertools import chain
+from django.contrib.auth.decorators import login_required
 
 from wallet.models import Transaction, Account
 from wallet import forms
@@ -129,3 +130,37 @@ def update_account(req: HttpRequest, id: int):
     }
 
     return render(req, 'wallet/edit_account.html', context=context)
+
+
+@login_required
+def monthly_summary(req: HttpRequest) -> HttpResponse:
+    accounts = Account.objects.all() if req.user.is_superuser else req.user.accounts.all()
+    qs = Transaction.objects.filter(account__user=req.user)
+
+    today = timezone.now().date()
+    form = forms.MonthlySummary(
+        accounts=accounts, data=req.GET or None,
+        initial={
+            "end_date": today,
+            "start_date": today.replace(day=1),
+            "accounts": [acc.id for acc in accounts]
+        }
+    )
+
+    if form.is_valid():
+        start = form.cleaned_data['start_date']
+        end = form.cleaned_data['end_date']
+        accounts = form.cleaned_data['accounts']
+    else:
+        start = form.initial['start_date']
+        end = form.initial['end_date']
+        accounts = form.initial['accounts']
+
+    datas = form.get_chart_data(qs, start, end, accounts)
+
+    context = {
+        "form": form,
+        "chart_data": json.dumps(datas)
+    }
+
+    return render(req, 'wallet/monthly_summary.html', context=context)

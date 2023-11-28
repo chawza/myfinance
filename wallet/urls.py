@@ -4,7 +4,7 @@ from . import views
 app_name = 'wallet'
 
 urlpatterns = [
-    path('', views.index, name='home'),
+    path('', views.monthly_summary, name='home'),
 
     # Records
     path('add', views.add_record, name='add_record'),
